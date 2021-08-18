@@ -53,7 +53,6 @@
 				beforeSend: function(xhr){xhr.setRequestHeader('X-WP-Nonce', wpApi['X-WP-Nonce'])},
 				dataType: 'json',
 			}).done(function(response){
-				console.log(response);
 				$('.upvote_text').html(response.like_count);
 				$('.downvote_text').html(response.dislike_count);
 				if (response.posts_user_interaction){
@@ -82,7 +81,6 @@
 		},
 		dataType: 'json',
 	}).done(function(response){
-		console.log(response);
 		$('.upvote_text').html(response.like_count);
 		$('.downvote_text').html(response.dislike_count);
 		if (response.posts_user_interaction){
