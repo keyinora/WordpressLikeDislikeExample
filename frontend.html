@@ -1,0 +1,103 @@
+<div class="social-interaction">
+    <div id="current_post_count" class="ct-text-block">Current Views: 6</div>
+    <div class="ct-div-block count-like">
+        <div class="ct-fancy-icon upvote_icon"><!--Down Icon--></div>
+        <div class="ct-text-block upvote_text">0</div>
+    </div>
+    <div class="ct-div-block count-dislike">
+        <div class="downvote_icon"><!--Down Icon--></div>
+        <div class="downvote_text">0</div>
+    </div>
+</div>
+<script>
+(function($){
+    //Like Logic
+	var like_clicked = $('.count-like');
+	if (like_clicked){
+		like_clicked.on('click', function(e){
+			var upVoteStatus = ($('.upvote_icon').hasClass('active'))? 'false' : 'true';
+			$.ajax({
+				method: 'POST',
+				url: wpApi.root+'post_tracker/v1/post_like/'+wpApi.user_id+'/'+wpApi.post_id+'/'+upVoteStatus+'/',
+				contentType: 'application/json; charset=utf-8',
+				beforeSend: function(xhr){xhr.setRequestHeader('X-WP-Nonce', wpApi['X-WP-Nonce'])},
+				dataType: 'json',
+			}).done(function(response){
+				$('.upvote_text').html(response.like_count);
+				$('.downvote_text').html(response.dislike_count);
+				if (response.posts_user_interaction){
+					if (response.posts_user_interaction.liked){
+						$('.upvote_icon').addClass('active');
+					} else {
+						$('.upvote_icon').removeClass('active');
+					}
+
+					if (response.posts_user_interaction.disliked){
+						$('.downvote_icon').addClass('active');
+					} else {
+						$('.downvote_icon').removeClass('active');
+					}
+				}
+			});
+		});
+	}
+    //Like DisLogic
+    var Dislike_clicked = $('.count-dislike');
+	if (Dislike_clicked){
+		Dislike_clicked.on('click', function(e){
+			var upVoteStatus = ($('.downvote_icon').hasClass('active'))? 'false' : 'true';
+			$.ajax({
+				method: 'POST',
+				url: wpApi.root+'post_tracker/v1/post_dislike/'+wpApi.user_id+'/'+wpApi.post_id+'/'+upVoteStatus+'/',
+				contentType: 'application/json; charset=utf-8',
+				beforeSend: function(xhr){xhr.setRequestHeader('X-WP-Nonce', wpApi['X-WP-Nonce'])},
+				dataType: 'json',
+			}).done(function(response){
+				console.log(response);
+				$('.upvote_text').html(response.like_count);
+				$('.downvote_text').html(response.dislike_count);
+				if (response.posts_user_interaction){
+					if (response.posts_user_interaction.liked){
+						$('.upvote_icon').addClass('active');
+					} else {
+						$('.upvote_icon').removeClass('active');
+					}
+
+					if (response.posts_user_interaction.disliked){
+						$('.downvote_icon').addClass('active');
+					} else {
+						$('.downvote_icon').removeClass('active');
+					}
+				}
+			});
+		});
+	}
+    //Load Default Data
+    $.ajax({
+		method: 'GET',
+		url: wpApi.root+'post_tracker/v1/get_post_stats/'+wpApi.user_id+'/'+wpApi.post_id+'/',
+		contentType: 'application/json; charset=utf-8',
+		beforeSend: function(xhr){
+			xhr.setRequestHeader('X-WP-Nonce', wpApi['X-WP-Nonce'])
+		},
+		dataType: 'json',
+	}).done(function(response){
+		console.log(response);
+		$('.upvote_text').html(response.like_count);
+		$('.downvote_text').html(response.dislike_count);
+		if (response.posts_user_interaction){
+			if (response.posts_user_interaction.liked){
+				$('.upvote_icon').addClass('active');
+			} else {
+				$('.upvote_icon').removeClass('active');
+			}
+
+			if (response.posts_user_interaction.disliked){
+				$('.downvote_icon').addClass('active');
+			} else {
+				$('.downvote_icon').removeClass('active');
+			}
+		}
+	});
+})(jQuery);
+</script>
