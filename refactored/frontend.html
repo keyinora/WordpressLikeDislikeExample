@@ -1,0 +1,78 @@
+<div class="social-interaction">
+    <div id="current_post_count" class="ct-text-block">Current Views: 6</div>
+    <div class="ct-div-block count-like">
+        <div class="ct-fancy-icon upvote_icon"><!--Down Icon--></div>
+        <div class="ct-text-block upvote_text">0</div>
+    </div>
+    <div class="ct-div-block count-dislike">
+        <div class="downvote_icon"><!--Down Icon--></div>
+        <div class="downvote_text">0</div>
+    </div>
+</div>
+<script>
+(function($){
+	function update_post_stats(data){
+		$('.upvote_text').html(data.like_count);
+		$('.downvote_text').html(data.dislike_count);
+		if (data.posts_user_interaction){
+			if (data.posts_user_interaction.liked){
+				$('.upvote_icon').addClass('active');
+			} else {
+				$('.upvote_icon').removeClass('active');
+			}
+
+			if (data.posts_user_interaction.disliked){
+				$('.downvote_icon').addClass('active');
+			} else {
+				$('.downvote_icon').removeClass('active');
+			}
+		}
+	}
+    
+	$.ajax({
+		method: 'GET',
+		url: wpApi.root+'post_tracker/v1/get_post_stats/'+wpApi.user_id+'/'+wpApi.post_id+'/',
+		contentType: 'application/json; charset=utf-8',
+		beforeSend: function(xhr){
+			xhr.setRequestHeader('X-WP-Nonce', wpApi['X-WP-Nonce'])
+		},
+		dataType: 'json',
+	}).done(function(response){
+		update_post_stats(response);
+	});
+
+	var like_clicked = $('.count-like');
+	if (like_clicked){
+		like_clicked.on('click', function(e){
+			console.log('click');
+			var upVoteStatus = ($('.upvote_icon').hasClass('active'))? 'false' : 'true';
+			$.ajax({
+				method: 'POST',
+				url: wpApi.root+'post_tracker/v1/post_like/'+wpApi.user_id+'/'+wpApi.post_id+'/'+upVoteStatus+'/',
+				contentType: 'application/json; charset=utf-8',
+				beforeSend: function(xhr){xhr.setRequestHeader('X-WP-Nonce', wpApi['X-WP-Nonce'])},
+				dataType: 'json',
+			}).done(function(response){
+				update_post_stats(response);
+			});
+		});
+	}
+
+
+	var like_clicked = $('.count-dislike');
+	if (like_clicked){
+		like_clicked.on('click', function(e){
+			var upVoteStatus = ($('.downvote_icon').hasClass('active'))? 'false' : 'true';
+			$.ajax({
+				method: 'POST',
+				url: wpApi.root+'post_tracker/v1/post_dislike/'+wpApi.user_id+'/'+wpApi.post_id+'/'+upVoteStatus+'/',
+				contentType: 'application/json; charset=utf-8',
+				beforeSend: function(xhr){xhr.setRequestHeader('X-WP-Nonce', wpApi['X-WP-Nonce'])},
+				dataType: 'json',
+			}).done(function(response){
+				update_post_stats(response);
+			});
+		});
+	}
+})(jQuery);
+</script>
